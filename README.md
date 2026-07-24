@@ -1,14 +1,14 @@
-# Análisis de E-commerce/Retail — Power BI (Online Retail)
+# Análisis de E-commerce/Retail 
 
 ## Contexto del negocio
 
-Análisis de un dataset transaccional real de una tienda online (Reino Unido, periodo diciembre 2010 – diciembre 2011), con el objetivo de responder preguntas de negocio típicas de retail/e-commerce: evolución de ventas, productos de mayor facturación, comportamiento de clientes por país, segmentación de clientes valiosos (RFM) y patrones de cancelación.
+Análisis de un dataset transaccional real de una tienda online (Reino Unido, periodo diciembre 2010 – diciembre 2011), con el objetivo de responder preguntas de negocio típicas de E-commerce/Retail : evolución de ventas, productos de mayor facturación, comportamiento de clientes por país, segmentación de clientes valiosos (RFM) y patrones de cancelación.
 
 ## Dataset
 
 **Online Retail** ([UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/352/online+retail) / [Kaggle](https://www.kaggle.com/datasets/jihyeseo/online-retail-data-set-from-uci-ml-repo)): 541.909 transacciones de una tienda online no física con sede en Reino Unido, que vende artículos de regalo. Incluye clientes mayoristas y minoristas de distintos países.
 
-**Por qué este dataset**: a diferencia de datasets más "prolijos" como Superstore, Online Retail contiene datos reales y sucios (nulos, códigos administrativos mezclados con productos, cancelaciones, ajustes de inventario), lo que permite realizar un trabajo de limpieza genuino — parte central del rol de analista de datos.
+**Por qué este dataset**: a diferencia de datasets más "prolijos" como Superstore, Online Retail contiene datos reales y sucios (nulos, códigos administrativos mezclados con productos, cancelaciones, ajustes de inventario), lo que permite realizar un trabajo de limpieza genuino.
 
 ## Preguntas de negocio
 
@@ -43,7 +43,7 @@ Convertido a tipo **Texto** (Power Query lo infería incorrectamente como númer
   Text.Select([StockCode], {"0".."9"}) = ""
   ```
   Un resultado `TRUE` (sin ningún dígito) indica un código especial, no un producto.
-- **2.796 filas (0,52% del dataset)** correspondientes a estos códigos administrativos (envío, descuentos, ajustes) fueron excluidas del análisis, por no representar transacciones de productos reales.
+- **2.796 filas (0,52% del dataset)** correspondientes a estos códigos administrativos (envío, descuentos, ajustes) fueron excluidas del análisis ya que no representan transacciones de productos reales.
 
 ### Description
 - Estandarizada a **mayúsculas** en toda la columna, para prevenir inconsistencias de conteo por diferencias de capitalización.
@@ -58,7 +58,7 @@ Convertido a tipo **Texto** (Power Query lo infería incorrectamente como númer
     [Quantity] < 0 and not Text.StartsWith([InvoiceNo], "C")
     ```
     y excluidos del dataset.
-- Validación cruzada aplicada tras el filtro: se confirmó que el 100% de los valores negativos remanentes corresponden a `InvoiceNo` con prefijo "C".
+- Validación aplicada tras el filtro: se confirmó que el 100% de los valores negativos remanentes corresponden a `InvoiceNo` con prefijo "C".
 
 ### InvoiceDate
 Sin valores nulos (confirmado con perfilado de calidad de columna sobre el conjunto de datos completo). Tipo de dato correcto (`datetime`). Sin acciones de limpieza necesarias.
@@ -94,7 +94,7 @@ Contiene una fila por transacción, con las claves de relación (`StockCode`, `C
 ### dim_Producto
 Generada como referencia de `fact_Ventas`, reducida a `StockCode` + `Description` únicos (3.816 productos). 
 
-**Problema detectado y resuelto**: la primera deduplicación dejó 3.925 filas en lugar de las esperadas, debido a inconsistencias de formato (espacios en blanco y variaciones de mayúsculas/minúsculas) en `StockCode`, que hacían que Power Query tratara como "distintos" códigos que en realidad eran el mismo producto. Se resolvió normalizando la columna (`Trim` + mayúsculas) antes de deduplicar, quedando en 3.816 filas genuinamente únicas.
+**Problema detectado y resuelto**: la primera deduplicación dejó 3.925 filas en lugar de las esperadas, debido a inconsistencias de formato (espacios en blanco y variaciones de mayúsculas/minúsculas) en `StockCode`, que hacían que Power Query tratara como "distintos" códigos que en realidad eran el mismo producto. Se resolvió normalizando la columna (`Trim` + mayúsculas) antes de deduplicar, quedando en 3.816 filas únicas.
 
 ### dim_Cliente
 Generada como referencia de `fact_Ventas`, reducida a `CustomerID` + `Country` únicos (4.379 clientes).
@@ -192,7 +192,7 @@ El informe consta de **3 páginas**, diseñadas para cubrir las 5 preguntas de n
 
 KPIs generales (Ventas Totales, Cantidad de Transacciones, Ticket Promedio, % Cancelación), evolución mensual de ventas y Top 10 países por facturación.
 
-**Hallazgo y corrección aplicada**: el gráfico de evolución mostraba una caída pronunciada en diciembre 2011. Se identificó que el dataset registra transacciones de ese mes solo hasta el día 9 (mes incompuesto), por lo que la caída no refleja una baja real de actividad. Se agregó un segundo gráfico con la medida `Ventas Promedio Diarias` (Ventas Totales ÷ días distintos con ventas en el período), que corrige el sesgo — bajo esta métrica, diciembre resulta ser el mes de mayor actividad comercial, consistente con la temporada de compras navideñas.
+**Hallazgo y corrección aplicada**: el gráfico de evolución mostraba una caída pronunciada en diciembre 2011. Se identificó que el dataset registra transacciones de ese mes solo hasta el día 9, por lo que la caída no refleja una baja real de actividad. Se agregó un segundo gráfico con la medida `Ventas Promedio Diarias` (Ventas Totales ÷ días distintos con ventas en el período), que corrige el sesgo — bajo esta métrica, diciembre resulta ser el mes de mayor actividad comercial, consistente con la temporada de compras navideñas. Por otra parte, Reino Unido representa cerca del 90% de los clientes identificados de la base, dejando a los demás países con una porción menor del negocio.
 
 ### Página 2 — Productos
 
