@@ -1,7 +1,5 @@
 # Análisis de E-commerce/Retail 
 
-Analisis E-commerce - Retail.pbix
-
 ## Contexto del negocio
 
 Análisis de un dataset transaccional real de una tienda online (Reino Unido, periodo diciembre 2010 – diciembre 2011), con el objetivo de responder preguntas de negocio típicas de E-commerce/Retail : evolución de ventas, productos de mayor facturación, comportamiento de clientes por país, segmentación de clientes valiosos (RFM) y patrones de cancelación.
